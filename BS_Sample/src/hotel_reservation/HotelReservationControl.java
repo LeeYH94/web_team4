@@ -146,7 +146,7 @@ public class HotelReservationControl {
 	}
 
 	// hotel의 room_total 바꾸는 메소드
-	public void updateHotelQuery(String hotel_num, String check_in,String check_out, String room_count) {
+	public void updateHotelQuery(String hotel_num, String check_in,String check_out, String room_count, int total_price) {
 		String query = "";
 		String room_total = "";
 		
@@ -180,14 +180,15 @@ public class HotelReservationControl {
 			pstm.setString(2, hotel_num);
 			pstm.executeQuery();
 			
-			// hotel_num update
+			// hotel_num update, check_in, check_out, total_price
 			query = "UPDATE HOTEL_INFORMATION SET HOTEL_NUM = ?"
-					+ ", CHECK_IN = ?, CHECK_OUT = ? WHERE HOTEL_RESERVATION = ?";
+					+ ", CHECK_IN = ?, CHECK_OUT = ?, HOTEL_TOTAL_PRICE = ? WHERE HOTEL_RESERVATION = ?";
 			pstm = conn.prepareStatement(query);
 			pstm.setString(1, hotel_num);	
 			pstm.setString(2, check_in);	
 			pstm.setString(3, check_out);	
-			pstm.setString(4, session_hotel_reservation);
+			pstm.setInt(4, total_price);
+			pstm.setString(5, session_hotel_reservation);
 			pstm.executeQuery();
 
 		} catch (SQLException sqle) {
@@ -314,29 +315,25 @@ public class HotelReservationControl {
 	}
 
 	// 호텔 총 가격 리턴하는 메소드
-	public int getHotelTotalPrice() {
+	public int getHotelTotalPrice(String hotel_num) {
 		String query = "";
 		int total_price = 0;
 		int[] room_total_ar = null;
-		String hotal_num = "";
 
 		try {
-			query = "SELECT HOTEL_NUM, ROOM_COUNT FROM HOTEL_INFORMATION WHERE HOTEL_RESERVATION = ?";
+			query = "SELECT ROOM_COUNT FROM HOTEL_INFORMATION WHERE HOTEL_RESERVATION = ?";
 			conn = DBConnection.getConnection();
 			pstm = conn.prepareStatement(query);
 			pstm.setString(1, session_hotel_reservation);
 			rs = pstm.executeQuery();
 
 			if (rs.next()) {
-				// hotel의 구분자로 나뉘어진 room_total 가져옴
-				hotal_num = rs.getString(1);
-				room_total_ar = stringToIntAr(rs.getString(2));
+				room_total_ar = stringToIntAr(rs.getString(1));
 			}
 
-			//TODO 쿼리문 오류
 			query = "SELECT ROOM_1, ROOM_2, ROOM_4 FROM HOTEL_CLASS WHERE HOTEL_NUM = ?";
 			pstm = conn.prepareStatement(query);
-			pstm.setString(1, hotal_num);
+			pstm.setString(1, hotel_num);
 			rs = pstm.executeQuery();
 			rs.next();
 			for (int i = 0; i < room_total_ar.length; i++) {

@@ -148,7 +148,7 @@ public class PlaneReservationControl {
 	}
 
 	// plane의 seat_total 바꾸는 메소드
-	public void updatePlaneQuery(String plane_num1, String plane_num2, String grade, int total_count) {
+	public void updatePlaneQuery(String plane_num1, String plane_num2, String grade, int total_count, int total_price) {
 		// plane_num_1에서도 사람 수 만큼 빼주어야 하고
 		// 왕복이면 plane_num_2에서도 빼주어야 함
 		String query = "";
@@ -194,14 +194,15 @@ public class PlaneReservationControl {
 			pstm.setString(2, plane_num1);
 			pstm.executeQuery();
 
-			// plane_num_1 update
-			query = "UPDATE PLANE_INFORMATION SET PLANE_NUM_1 = ? WHERE PLANE_RESERVATION = ?";
+			// plane_num_1, grade update
+			query = "UPDATE PLANE_INFORMATION SET PLANE_NUM_1 = ?, GRADE = ?, PLANE_TOTAL_PRICE = ? WHERE PLANE_RESERVATION = ?";
 			pstm = conn.prepareStatement(query);
 			pstm.setString(1, plane_num1);	
-			pstm.setString(2, session_plane_reservation);
+			pstm.setString(2, grade);	
+			pstm.setInt(3,total_price);
+			pstm.setString(4, session_plane_reservation);
 			pstm.executeQuery();
-			
-			// grade update
+
 			query = "UPDATE PLANE_INFORMATION SET GRADE = ? WHERE PLANE_RESERVATION = ?";
 			pstm = conn.prepareStatement(query);
 			pstm.setString(1, grade);	
@@ -342,16 +343,13 @@ public class PlaneReservationControl {
 //	}
 
 //	 총 가격 리턴하는 메소드
-	public int getPlaneTotalPrice() {
+	public int getPlaneTotalPrice(String plane_num1, String plane_num2, String grade) {
 		String query = "";
 		int total_price = 0;
-		String plane_num_1 = "";
-		String plane_num_2 = "";
-		String grade = "";
 		int[] arSeat_cnt = null;
 
 		try {
-			query = "SELECT PLANE_NUM_1, PLANE_NUM_2, GRADE, SEAT_COUNT"
+			query = "SELECT SEAT_COUNT"
 					+ " FROM PLANE_INFORMATION WHERE PLANE_RESERVATION = ?";
 			// 쿼리문 오류 수정바람 TODO
 			conn = DBConnection.getConnection();
@@ -359,26 +357,23 @@ public class PlaneReservationControl {
 			pstm.setString(1, session_plane_reservation);
 			rs = pstm.executeQuery();
 			if (rs.next()) {
-				plane_num_1 = rs.getString(1);
-				plane_num_2 = rs.getString(2);
-				grade = rs.getString(3);
-				arSeat_cnt = stringToIntAr(rs.getString(4));
+				arSeat_cnt = stringToIntAr(rs.getString(1));
 			}
 			query = "SELECT ADULT, CHILD, BABY FROM " + grade + " WHERE PLANE_NUM = ?";				
 			pstm = conn.prepareStatement(query);
-			pstm.setString(1, plane_num_1);
+			pstm.setString(1, plane_num1);
 			rs = pstm.executeQuery();
 			rs.next();
 			for (int i = 0; i < arSeat_cnt.length; i++) {
 				total_price += arSeat_cnt[i] * rs.getInt(i + 1);
 			}
 
-			if (plane_num_2 != null) {
+			if (plane_num2 != null) {
 				// 왕복일 경우
 				
 				query = "SELECT ADULT, CHILD, BABY FROM " + grade + " WHERE PLANE_NUM = ?";	
 				pstm = conn.prepareStatement(query);
-				pstm.setString(1, plane_num_2);
+				pstm.setString(1, plane_num2);
 				rs = pstm.executeQuery();
 				rs.next();
 				for (int i = 0; i < arSeat_cnt.length; i++) {

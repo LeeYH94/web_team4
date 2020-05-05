@@ -12,6 +12,7 @@ import hotel_reservation.HotelReservationControl;
 import hotels.HotelControl;
 import plane_reservation.PlaneReservationControl;
 import planes.PlaneControl;
+import users.PhoneM;
 import users.UsersControl;
 
 public class CoreView {
@@ -23,6 +24,7 @@ public class CoreView {
 	HotelReservationControl hotelReservationControl = new HotelReservationControl();
 	HotelControl hotelControl = new HotelControl();
 	MainPromptCalender mainPromptCalender = new MainPromptCalender();
+	PhoneM phoneMessage = new PhoneM();
 
 	public static String session_id;
 
@@ -40,9 +42,13 @@ public class CoreView {
 		int choice = 0, trip_choice = 0, round_choice = 0, login_choice = 0;
 		int departure_choice = 0, arrival_choice = 0, city_choice = 0;
 		int total_price = 0;
+		int seat_count = 0;
+		
 		String plane_num1 = "", plane_num2 = "", hotel_num = "";
 		String check_in = "", check_out = "";
 		String final_choice = "";
+		String grade = "";
+		String room_count = "";
 		// mypage 선택 사항 변수
 		int mypage_choice = 0;
 		ArrayList<String> user_choice = new ArrayList<String>();
@@ -255,18 +261,17 @@ public class CoreView {
 								for (int i = 0; i < ar_planeclass_choice.length; i++) {
 									System.out.println((i + 1) + ar_planeclass_choice[i]);
 								}
-								String grade = ar_planeclass_choice[sc.nextInt() - 1];
+								grade = ar_planeclass_choice[sc.nextInt() - 1];
 
 								// 등급별 가격 출력
 								System.out.println("ADULT\tCHILD\tBABY");
 								planeControl.showGradePrice(plane_num1, grade);
 
 								// 성인, 소아, 유아 인원수 입력
-								int seat_count = planeReservationControl.setSeatCount();
-								planeReservationControl.updatePlaneQuery(plane_num1, null, grade, seat_count);
-								total_price = planeReservationControl.getPlaneTotalPrice();
-								point = (int)(total_price * 0.1);
-								//System.out.println("[예매내역]    :" + selectAll());
+								seat_count = planeReservationControl.setSeatCount();
+								total_price = planeReservationControl.getPlaneTotalPrice(plane_num1, null, grade);
+								point = (int) (total_price * 0.1);
+								// System.out.println("[예매내역] :" + selectAll());
 								System.out.println("[결제금액]	:" + total_price + "원");
 								System.out.println("[포인트 적립]	:" + point + "원");
 							} else {
@@ -305,22 +310,27 @@ public class CoreView {
 									} catch (Exception e) {
 										System.out.println("로그인 오류");
 									}
-								} else{
-									//포인트 적립
+								} else {
+									//업데이트
+									planeReservationControl.updatePlaneQuery(plane_num1, null, grade, seat_count, total_price);
+									// 포인트 적립
 									usersControl.pointUpdate(point, session_id);
+//									TODO
+//									phoneMessage.phoneM(session_id, phoneMessage.selectPhone());
 									System.out.println("예매 완료");
-								} 
 
-							}else if(final_choice.equals("N")){
+								}
+
+							} else if (final_choice.equals("N")) {
 //								continue;
-							}else {
+							} else {
 								System.out.println("잘못입력하셨습니다.");
 							}
 							break;
 
 						// 왕복 영역
 						case 2:
-							//출발
+							// 출발
 							System.out.println("[출발일]");
 							userDate = mainPromptCalender.runPROMPT();
 							System.out.print("시간을 입력하세요 : ");
@@ -331,7 +341,7 @@ public class CoreView {
 							System.out.println("비행기 번호 입력 : ");
 							plane_num1 = sc.next().toUpperCase();
 
-							//도착
+							// 도착
 							System.out.println("[도착일]");
 							userDate = mainPromptCalender.runPROMPT();
 							System.out.print("시간을 입력하세요 : ");
@@ -342,7 +352,7 @@ public class CoreView {
 							System.out.println("비행기 번호 입력 : ");
 							plane_num2 = sc.next().toUpperCase();
 
-							//비행기 번호 확인
+							// 비행기 번호 확인
 							if (planeReservationControl.checkPlaneNum(plane_num1)
 									&& planeReservationControl.checkPlaneNum(plane_num2)) {
 								// 비행기 클래스 선택
@@ -350,7 +360,7 @@ public class CoreView {
 								for (int i = 0; i < ar_planeclass_choice.length; i++) {
 									System.out.println((i + 1) + ar_planeclass_choice[i]);
 								}
-								String grade = ar_planeclass_choice[sc.nextInt() - 1];
+								grade = ar_planeclass_choice[sc.nextInt() - 1];
 
 								// 등급별 가격 출력
 								System.out.println("ADULT\tCHILD\tBABY");
@@ -358,11 +368,10 @@ public class CoreView {
 								planeControl.showGradePrice(plane_num2, grade);
 
 								// 성인, 소아, 유아 인원수 입력
-								int seat_count = planeReservationControl.setSeatCount();
-								planeReservationControl.updatePlaneQuery(plane_num1, plane_num2, grade, seat_count);
-								total_price = planeReservationControl.getPlaneTotalPrice();
-								point = (int)(total_price * 0.1);
-								//System.out.println("[예매내역]    :" + selectAll());
+								seat_count = planeReservationControl.setSeatCount();
+								total_price = planeReservationControl.getPlaneTotalPrice(plane_num1, plane_num2, grade);
+								point = (int) (total_price * 0.1);
+								// System.out.println("[예매내역] :" + selectAll());
 								System.out.println("[결제금액]	:" + total_price + "원");
 								System.out.println("[포인트 적립]	:" + point + "원");
 							} else {
@@ -401,15 +410,19 @@ public class CoreView {
 									} catch (Exception e) {
 										System.out.println("로그인 오류");
 									}
-								} else{
-									//포인트 적립
-									usersControl.pointUpdate(point, session_id);					
-									System.out.println("예매 완료");					
-								} 
+								} else {
+									//업데이트
+									planeReservationControl.updatePlaneQuery(plane_num1, null, grade, seat_count, total_price);
+									// 포인트 적립
+									usersControl.pointUpdate(point, session_id);
+//									TODO
+//									phoneMessage.phoneM(session_id, phoneMessage.selectPhone());
+									System.out.println("예매 완료");
+								}
 
-							}else if(final_choice.equals("N")){
+							} else if (final_choice.equals("N")) {
 //								continue;
-							}else {
+							} else {
 								System.out.println("잘못입력하셨습니다.");
 							}
 
@@ -420,19 +433,19 @@ public class CoreView {
 							break;
 						}
 
-						// 호텔영역
+					// 호텔영역
 					case 2:
-						//예약번호
+						// 예약번호
 						hotelReservationControl.startHotelReservation(session_id);
-						
-						//여행지
+
+						// 여행지
 						System.out.println("[여행지]");
 						for (int i = 0; i < arMenu_1_2.length; i++) {
 							System.out.println((i + 1) + arMenu_1_2[i]);
 						}
 						// 인덱스로 접근하기 위해서 -1
 						city_choice = sc.nextInt() - 1;
-						
+
 						// 입실일, 퇴실일 입력
 						// 달력 출력메소드
 						System.out.println("[입실일]");
@@ -441,25 +454,24 @@ public class CoreView {
 						check_out = mainPromptCalender.runPROMPT();
 						// 여행지에 맞는 호텔리스트 출력(여행지,입실일 )
 						hotelControl.getHotelList(arMenu_1_2[city_choice], check_in);
-						
+
 						System.out.println("호텔 번호 입력 : ");
 						hotel_num = sc.next();
-						
-						if(hotelReservationControl.checkHotelNum(hotel_num)) {
-							//객실 가격 출력
+
+						if (hotelReservationControl.checkHotelNum(hotel_num)) {
+							// 객실 가격 출력
 							hotelControl.showHotelPriceList(hotel_num);
-							
-							//객실 선택
+
+							// 객실 선택
 							System.out.println("[1인실/2인실/4인실]");
-							String room_count = hotelReservationControl.setRoomCount();
-							hotelReservationControl.updateHotelQuery(hotel_num, check_in, check_out, room_count);
-							total_price = hotelReservationControl.getHotelTotalPrice();
-							point = (int)(total_price * 0.1);
-							//System.out.println("[예매내역]    :" + selectAll());
+							room_count = hotelReservationControl.setRoomCount();
+							total_price = hotelReservationControl.getHotelTotalPrice(hotel_num);
+							point = (int) (total_price * 0.1);
+							// System.out.println("[예매내역] :" + selectAll());
 							System.out.println("[결제금액]	:" + total_price + "원");
 							System.out.println("[포인트 적립]	:" + point + "원");
-							
-						}else {
+
+						} else {
 							System.out.println("비행기 번호 잘못 입력");
 						}
 						System.out.println("결제 하시겠습니까?(네: Y         아니요: N)");
@@ -494,14 +506,19 @@ public class CoreView {
 								} catch (Exception e) {
 									System.out.println("로그인 오류");
 								}
-							} else{
+							} else {
+								//업데이트
+								hotelReservationControl.updateHotelQuery(hotel_num, check_in, check_out, room_count,total_price);
+								// 포인트 적립
+								usersControl.pointUpdate(point, session_id);
+//								TODO
+//								phoneMessage.phoneM(session_id, phoneMessage.selectPhone());
 								System.out.println("예매 완료");
-//								TODO 포인트 적립 메소드 필요
-							} 
+							}
 
-						}else if(final_choice.equals("N")){
+						} else if (final_choice.equals("N")) {
 //							continue;
-						}else {
+						} else {
 							System.out.println("잘못입력하셨습니다.");
 						}
 
