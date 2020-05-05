@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<psf version="2.0">
-<provider id="org.eclipse.team.svn.core.svnnature">
-<project reference="1.0.1,https://svn.riouxsvn.com/web_team4,web_team4,d06556576179001a1936c6f377b9f147;https://svn.riouxsvn.com/web_team4;https://svn.riouxsvn.com/web_team4;branches;tags;trunk;true;8be432a2-84e0-410e-b626-65c8ad026b7b;https://svn.riouxsvn.com/web_team4;;false;;;0"/>
-</provider>
-</psf>
