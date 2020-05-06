@@ -32,8 +32,8 @@ public class UsersControl {
 		String host = "smtp.naver.com";
 
 		// --- 안에 보내는 사람 이메일 주소(@naver.com)제외, 비밀번호
-		final String id = "---";
-		final String pw = "---";
+		final String id = "yhya0904";
+		final String pw = "leeheader7679!";
 		int port = 465;
 
 		String recipient = email;
@@ -60,7 +60,7 @@ public class UsersControl {
 
 		Message mimeMessage = new MimeMessage(session);
 		// --- 안에 보내는 사람 이메일 주소 넣기 (@naver.com) 포함
-		mimeMessage.setFrom(new InternetAddress("---@naver.com"));
+		mimeMessage.setFrom(new InternetAddress("yhya0904@naver.com"));
 		mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 		mimeMessage.setSubject(subject);
 		mimeMessage.setText(Integer.toString(body));

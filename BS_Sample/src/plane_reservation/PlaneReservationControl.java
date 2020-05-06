@@ -194,19 +194,13 @@ public class PlaneReservationControl {
 			pstm.setString(2, plane_num1);
 			pstm.executeQuery();
 
-			// plane_num_1, grade update
+			// plane_num_1 update
 			query = "UPDATE PLANE_INFORMATION SET PLANE_NUM_1 = ?, GRADE = ?, PLANE_TOTAL_PRICE = ? WHERE PLANE_RESERVATION = ?";
 			pstm = conn.prepareStatement(query);
 			pstm.setString(1, plane_num1);	
-			pstm.setString(2, grade);	
-			pstm.setInt(3,total_price);
+			pstm.setString(2, grade);
+			pstm.setInt(3, total_price);
 			pstm.setString(4, session_plane_reservation);
-			pstm.executeQuery();
-
-			query = "UPDATE PLANE_INFORMATION SET GRADE = ? WHERE PLANE_RESERVATION = ?";
-			pstm = conn.prepareStatement(query);
-			pstm.setString(1, grade);	
-			pstm.setString(2, session_plane_reservation);
 			pstm.executeQuery();
 
 		} catch (SQLException sqle) {

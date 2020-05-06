@@ -180,7 +180,7 @@ public class HotelReservationControl {
 			pstm.setString(2, hotel_num);
 			pstm.executeQuery();
 			
-			// hotel_num update, check_in, check_out, total_price
+			// hotel_num update
 			query = "UPDATE HOTEL_INFORMATION SET HOTEL_NUM = ?"
 					+ ", CHECK_IN = ?, CHECK_OUT = ?, HOTEL_TOTAL_PRICE = ? WHERE HOTEL_RESERVATION = ?";
 			pstm = conn.prepareStatement(query);
@@ -188,7 +188,7 @@ public class HotelReservationControl {
 			pstm.setString(2, check_in);	
 			pstm.setString(3, check_out);	
 			pstm.setInt(4, total_price);
-			pstm.setString(5, session_hotel_reservation);
+			pstm.setString(4, session_hotel_reservation);
 			pstm.executeQuery();
 
 		} catch (SQLException sqle) {
@@ -319,6 +319,7 @@ public class HotelReservationControl {
 		String query = "";
 		int total_price = 0;
 		int[] room_total_ar = null;
+		String hotal_num = "";
 
 		try {
 			query = "SELECT ROOM_COUNT FROM HOTEL_INFORMATION WHERE HOTEL_RESERVATION = ?";
@@ -331,6 +332,7 @@ public class HotelReservationControl {
 				room_total_ar = stringToIntAr(rs.getString(1));
 			}
 
+			//TODO Äõ¸®¹® ¿À·ù
 			query = "SELECT ROOM_1, ROOM_2, ROOM_4 FROM HOTEL_CLASS WHERE HOTEL_NUM = ?";
 			pstm = conn.prepareStatement(query);
 			pstm.setString(1, hotel_num);
