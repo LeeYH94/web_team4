@@ -1,23 +1,25 @@
 package users;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
 import core.CoreView;
-import oracle.net.aso.s;
 
 public class UsersView {
 	Scanner sc = new Scanner(System.in);
+	Random ran = new Random();
 	UsersControl usersControl = new UsersControl();
 	
-	String id = "", pw = "", name = "", phone = "", email = "";
+	String id = "", pw = "", name = "", phone = "", email = "", nonmember_id = "";
 	int point = 0, login_choice = 0, mypage_choice = 0, choice = 0;
-	boolean id_check = true, login_flag = false;
+	boolean id_check = true, login_flag = false , non_member_login_flag = false;
 
 	String menu_1_1 = "1.예약 목록\n2.예약 수정\n3.회원 정보 수정 "; // 마이페이지 메뉴
 
+	//회원가입
 	public String[] registerUsersView() {
 		String[] usersPwAndPhone = new String[2];
 		// ID입력
@@ -70,6 +72,7 @@ public class UsersView {
 		return usersPwAndPhone;
 	}
 
+	//로그인
 	public boolean loginUsersView() {
 		System.out.println("========로그인=======");
 		System.out.print("아이디를 입력하세요 : ");
@@ -94,9 +97,65 @@ public class UsersView {
 			System.out.println("로그인 오류");
 		}
 		return login_flag;
+	}
+	
+	//비회원 로그인
+	public boolean nonMember_loginUsersView() {
+		String temp_1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		String temp_2 = "0123456789";
 
+		
+		//비회원 아이디
+	    for (int i = 0; i < 4; i++) {
+	    	nonmember_id += temp_1.charAt(ran.nextInt(temp_1.length()));
+	       	for (int j = 0; j < 2; j++) {
+	       		nonmember_id += temp_2.charAt(ran.nextInt(temp_2.length()));		
+	       		}
+	        }
+
+        if(usersControl.checkDupId(nonmember_id) == true) {
+        	while (id_check) {
+        		nonmember_id = "";
+        		for (int i = 0; i < 4; i++) {
+			       	nonmember_id += temp_1.charAt(ran.nextInt(temp_1.length()));
+			       	for (int j = 0; j < 2; j++) {
+			       		nonmember_id += temp_2.charAt(ran.nextInt(temp_2.length()));		
+			       		}
+			        }
+        		if (usersControl.checkDupId(id) == false) {
+					id_check = false;
+					break;
+				}
+        		break;
+        	}
+        }
+        
+        id_check = true;
+		
+        System.out.println("이름을 입력하세요.");
+    	name = sc.next();
+    	System.out.println("번호를 입력하세요.");
+    	phone = sc.next();
+    	System.out.println("이메일을 입력하세요.");
+    	email = sc.next();
+    	
+		try {
+			if (usersControl.register(nonmember_id, null, name, phone, email, point)) {
+				System.out.println("비회원");
+				non_member_login_flag = true;
+				CoreView.session_id = nonmember_id;
+			} else {
+				System.out.println("실패");
+			}
+		} catch (AddressException e) {
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		return non_member_login_flag;
 	}
 
+	//마이페이지
 	public void selectMypageUsersView(String pw, String phone) {
 		String new_PW = "", new_Phone = "";
 		System.out.println(menu_1_1);

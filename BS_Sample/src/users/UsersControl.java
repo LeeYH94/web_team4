@@ -93,7 +93,11 @@ public class UsersControl {
 				conn = DBConnection.getConnection();
 				pstm = conn.prepareStatement(query);
 				pstm.setString(++idx, id);
-				pstm.setString(++idx, encrypt(pw));
+				if(pw == null) {
+					pstm.setString(++idx, null);
+				}else {
+					pstm.setString(++idx, encrypt(pw));
+				}
 				pstm.setString(++idx, name);
 				pstm.setString(++idx, phone);
 				pstm.setString(++idx, email);
@@ -168,12 +172,7 @@ public class UsersControl {
 		return check;
 
 	}
-	
-	//로그아웃 메소드
-	public void logout() {
-		session_id = null;
-	}
-	
+
 	//회원정보수정 메소드
 	   public boolean updateMember(String pw,String new_pw,String phone,String new_phone) {
 	      //DB에서 회원정보를 가져오기 위해 Update 사용한다.
@@ -255,6 +254,7 @@ public class UsersControl {
 		}
 		return check;
 	}
+	
 	//포인트 적립 메소드
 	public void pointUpdate(int point, String id) {
 		String query = "";

@@ -21,6 +21,7 @@ public class CoreView {
 	String title = "ABO 여행사\n";
 	String menu = "1. 회원가입\n2. 로그인\n3. 비회원 예매하기\n4. 종료";
 	String menu_1 = "1. 마이페이지\n2. 예매하기\n3. 로그아웃";
+	String menu_2 = "1. 예매하기\n2. 로그아웃";
 
 	boolean non_member_login_flag = false, login_flag = false;
 
@@ -40,22 +41,27 @@ public class CoreView {
 					login_flag = usersView.loginUsersView();
 					break;
 				case 3:
-//					비회원login();
+					non_member_login_flag = usersView.nonMember_loginUsersView();
+					login_flag = true;
 					break;
 				case 4:
 					return;
 				}
 			}
-
+			
+			//비회원 메뉴
 			if (non_member_login_flag) {
-				reserveView();
-//				비회원_로그아웃();
-			} else {
+					reserveView();
+					session_id = null;
+					non_member_login_flag = false;
+				
+			} else {//회원메뉴
 				while (true) {
-					boolean logout = false;
+					//boolean logout = false;
 					System.out.println(menu_1);
 					choice = sc.nextInt();
 
+//					1. 마이페이지\n2. 예매하기\n3. 로그아웃					
 					switch (choice) {
 					case 1:
 //						usersView.selectMypageUsersView(pw, phone);

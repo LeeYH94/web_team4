@@ -25,7 +25,7 @@ public class HotelReservationView {
 
 	String menu_1 = "1. 마이페이지\n2. 예매하기\n3. 로그아웃";
 
-	public void selectHotelReservationView(boolean login_flag) {
+	public void selectHotelReservationView(boolean non_member_login_flag) {
 		hotelReservationControl.startHotelReservation(CoreView.session_id);
 
 		// 여행지
@@ -55,11 +55,18 @@ public class HotelReservationView {
 			// 객실 선택
 			System.out.println("[1인실/2인실/4인실]");
 			room_count = hotelReservationControl.setRoomCount();
-			total_price = hotelReservationControl.getHotelTotalPrice(hotel_num);
-			point = (int) (total_price * 0.1);
+			
 			// System.out.println("[예매내역] :" + selectAll());
+			total_price = hotelReservationControl.getHotelTotalPrice(hotel_num);
 			System.out.println("[결제금액]	:" + total_price + "원");
-			System.out.println("[포인트 적립]	:" + point + "원");
+			
+			if(non_member_login_flag) {
+				point = 0;
+			}else {
+				point = (int) (total_price * 0.1);
+				System.out.println("[포인트 적립] :" + point + "원");
+			}
+			
 
 		} else {
 			System.out.println("호텔 번호 잘못 입력");
@@ -69,6 +76,7 @@ public class HotelReservationView {
 
 		if (final_choice.equals("Y")) {
 			hotelReservationControl.updateHotelQuery(hotel_num, check_in, check_out, room_count,total_price);
+			usersControl.pointUpdate(point, CoreView.session_id);
 			phoneM.phoneM(CoreView.session_id, phoneM.selectPhone(CoreView.session_id));
 			System.out.println("예매완료");
 		}

@@ -24,7 +24,7 @@ public class PlaneReservationView {
 
 	String menu_1 = "1. 마이페이지\n2. 예매하기\n3. 로그아웃";
 
-	public void selectPlaneReservationView(boolean login_flag) {
+	public void selectPlaneReservationView(boolean non_member_login_flag) {
 
 		planeReservationControl.startPlaneReservation(CoreView.session_id);
 
@@ -77,11 +77,17 @@ public class PlaneReservationView {
 
 				// 성인, 소아, 유아 인원수 입력
 				seat_count = planeReservationControl.setSeatCount();
-				total_price = planeReservationControl.getPlaneTotalPrice(plane_num1, null, grade);
-				point = (int) (total_price * 0.1);
+				
 				// System.out.println("[예매내역] :" + selectAll());
+				total_price = planeReservationControl.getPlaneTotalPrice(plane_num1, null, grade);
 				System.out.println("[결제금액]	:" + total_price + "원");
-				System.out.println("[포인트 적립]	:" + point + "원");
+				if(non_member_login_flag) {
+					point = 0;
+				}else {
+					point = (int) (total_price * 0.1);
+					System.out.println("[포인트 적립] :" + point + "원");
+				}
+				
 			} else {
 				System.out.println("잘못된 비행기 번호");
 			}
@@ -141,11 +147,16 @@ public class PlaneReservationView {
 
 				// 성인, 소아, 유아 인원수 입력
 				seat_count = planeReservationControl.setSeatCount();
-				total_price = planeReservationControl.getPlaneTotalPrice(plane_num1, plane_num2, grade);
-				point = (int) (total_price * 0.1);
+				
 				// System.out.println("[예매내역] :" + selectAll());
+				total_price = planeReservationControl.getPlaneTotalPrice(plane_num1, null, grade);
 				System.out.println("[결제금액]	:" + total_price + "원");
-				System.out.println("[포인트 적립]	:" + point + "원");
+				if(non_member_login_flag) {
+					point = 0;
+				}else {
+					point = (int) (total_price * 0.1);
+					System.out.println("[포인트 적립] :" + point + "원");
+				}
 			} else {
 				System.out.println("잘못된 입력입니다.");
 			}
